@@ -1,0 +1,9 @@
+
+Library/**
+Temp/**
+obj/**
+.vs/**
+Packages/**
+*.sln
+*.csproj
+desktop.ini
