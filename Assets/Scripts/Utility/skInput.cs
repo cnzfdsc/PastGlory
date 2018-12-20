@@ -94,9 +94,14 @@ public class skInput : MonoBehaviour
 			return false;
 		}
 	}
+
+	public Vector3 GetMousePosition()
+	{
+		return Input.mousePosition;
+	}
 #endif
 
-#endregion
+	#endregion
 
 	#region Private方法
 	#endregion
