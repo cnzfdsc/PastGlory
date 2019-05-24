@@ -141,6 +141,7 @@ public class skInput : MonoBehaviour
 								? TouchPhase.Began
 								: TouchPhase.Moved;
 			touch0.ScreenPoint = Input.mousePosition;
+			touch0.ScreenPoint.y = Screen.height - touch0.ScreenPoint.y;
 			touch0.TapCount = 1;
 			touch0._SetBeginTime(Time.realtimeSinceStartup);
 		}
@@ -151,6 +152,7 @@ public class skInput : MonoBehaviour
 			touch0.Click = Time.realtimeSinceStartup - touch0._GetBeginTime() < MAX_CLICK_TIME;
 			touch0.Phase = TouchPhase.Ended;
 			touch0.ScreenPoint = Input.mousePosition;
+			touch0.ScreenPoint.y = Screen.height - touch0.ScreenPoint.y;
 			touch0.TapCount = Time.realtimeSinceStartup - touch0._GetEndTime() < MAX_DOUBLE_CLICK_TIME ? 2 : 1;
 			touch0._SetEndTime(Time.realtimeSinceStartup);
 		}
@@ -168,16 +170,18 @@ public class skInput : MonoBehaviour
 								? TouchPhase.Began
 								: TouchPhase.Moved;
 			touch1.ScreenPoint = Input.mousePosition;
+			touch1.ScreenPoint.y = Screen.height - touch1.ScreenPoint.y;
 			touch1.TapCount = 1;
 			touch1._SetBeginTime(Time.realtimeSinceStartup);
 		}
-		else if (Input.GetMouseButtonUp(0))
+		else if (Input.GetMouseButtonUp(1))
 		{
 			InputTouch touch1 = m_InputTouchs[1];
 			touch1.FingerID = 0;
 			touch1.Click = Time.realtimeSinceStartup - touch1._GetBeginTime() < MAX_CLICK_TIME;
 			touch1.Phase = TouchPhase.Ended;
 			touch1.ScreenPoint = Input.mousePosition;
+			touch1.ScreenPoint.y = Screen.height - touch1.ScreenPoint.y;
 			touch1.TapCount = Time.realtimeSinceStartup - touch1._GetEndTime() < MAX_DOUBLE_CLICK_TIME ? 2 : 1;
 			touch1._SetEndTime(Time.realtimeSinceStartup);
 		}
@@ -216,6 +220,9 @@ public class skInput : MonoBehaviour
 		/// 如果FingerID小于0, 则这个InputTouch没有使用. 即: FingerID >= 0 相当于Enabled, FingerID < 0 相当于Disabled
 		/// </summary>
 		public int FingerID;
+		/// <summary>
+		/// 左上角为(0, 0)
+		/// </summary>
 		public Vector2 ScreenPoint;
 		public TouchPhase Phase;
 		/// <summary>
@@ -239,6 +246,7 @@ public class skInput : MonoBehaviour
 		{
 			FingerID = -1;
 			ScreenPoint = Vector2.zero;
+			ScreenPoint.y = Screen.height - ScreenPoint.y;
 			Phase = TouchPhase.Ended;
 			Click = false;
 			TapCount = 0;

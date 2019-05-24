@@ -31,7 +31,10 @@ public class pgUnitCommandManager : MonoBehaviour
 		}
 	}
 
-	protected void Update()
+	private bool m_SelectingByRect = false;
+	private Rect m_SelectingRect = new Rect();
+
+	void Update()
 	{
 		// 选择单位
 		// 单击选择
@@ -58,7 +61,36 @@ public class pgUnitCommandManager : MonoBehaviour
 			}
 		}
 
-		// TODO, 框选 / 取消选择
+		// 框选
+		if (skInput.Instance.GetLeftButtonDown(out touch))
+		{
+			if (!m_SelectingByRect)
+			{
+				// TODO, 开始画框 
+
+				m_SelectingRect.min = touch.ScreenPoint;
+				m_SelectingRect.max = touch.ScreenPoint;
+				Debug.Log("开始框选, Rect开始坐标: " + m_SelectingRect.min);
+				m_SelectingByRect = true;
+			}
+			else
+			{
+				m_SelectingRect.max = touch.ScreenPoint;
+				Debug.Log("修改框选, Rect: " + m_SelectingRect);
+			}
+		}
+		
+		if (skInput.Instance.GetLeftButtonUp(out touch))
+		{
+			if (m_SelectingByRect)
+			{
+				// TODO, 获取框选到的单位
+
+				m_SelectingRect = Rect.zero;
+				m_SelectingByRect = false;
+				Debug.Log("结束框选, Rect结束坐标: " + m_SelectingRect.max);
+			}
+		}
 
 		// 操作单位. 攻击/移动/扫荡
 		// 移动
@@ -93,6 +125,14 @@ public class pgUnitCommandManager : MonoBehaviour
 					m_SelectingUnits[i].Move(destination);
 				}
 			}
+		}
+	}
+
+	private void OnGUI()
+	{
+		if (m_SelectingByRect)
+		{
+			skUIUtility.DrawScreenRect(m_SelectingRect);
 		}
 	}
 	#endregion
