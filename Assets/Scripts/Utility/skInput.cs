@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -161,7 +161,7 @@ public class skInput : MonoBehaviour
 	}
 	protected void Start()
 	{
-
+		
 	}
 
 	protected void Update()
@@ -180,6 +180,7 @@ public class skInput : MonoBehaviour
 			// Windows上不触发skTouchPhase.stationary状态. 不记得有什么操作需要鼠标在同一个地方按下不动的.
 			touch0.Phase = skTouchPhase.Began;
 			touch0.ScreenPoint = Input.mousePosition;
+			touch0.ScreenPoint.y = Screen.height - touch0.ScreenPoint.y;
 			touch0.TapCount = 1;
 			touch0._SetBeginTime(Time.realtimeSinceStartup);
 
@@ -201,6 +202,7 @@ public class skInput : MonoBehaviour
 			touch0.Click = Time.realtimeSinceStartup - touch0._GetBeginTime() < CLICK_THRESHOLD;
 			touch0.Phase = skTouchPhase.Ended;
 			touch0.ScreenPoint = Input.mousePosition;
+			touch0.ScreenPoint.y = Screen.height - touch0.ScreenPoint.y;
 			touch0.TapCount = Time.realtimeSinceStartup - touch0._GetEndTime() < MAX_DOUBLE_CLICK_TIME ? 2 : 1;
 			touch0._SetEndTime(Time.realtimeSinceStartup);
 			if (Time.realtimeSinceStartup - touch0._GetBeginTime() < CLICK_THRESHOLD)
@@ -219,6 +221,7 @@ public class skInput : MonoBehaviour
 			touch1.Click = false;
 			touch1.Phase = skTouchPhase.Began;
 			touch1.ScreenPoint = Input.mousePosition;
+			touch1.ScreenPoint.y = Screen.height - touch1.ScreenPoint.y;
 			touch1.TapCount = 1;
 
 			if (justActivated)
@@ -238,6 +241,7 @@ public class skInput : MonoBehaviour
 			touch1.FingerID = 0;
 			touch1.Click = Time.realtimeSinceStartup - touch1._GetBeginTime() < CLICK_THRESHOLD;
 			touch1.ScreenPoint = Input.mousePosition;
+			touch1.ScreenPoint.y = Screen.height - touch1.ScreenPoint.y;
 			touch1.TapCount = Time.realtimeSinceStartup - touch1._GetEndTime() < MAX_DOUBLE_CLICK_TIME ? 2 : 1;
 			touch1._SetEndTime(Time.realtimeSinceStartup);
 			if (Time.realtimeSinceStartup - touch1._GetBeginTime() < CLICK_THRESHOLD)
@@ -248,12 +252,12 @@ public class skInput : MonoBehaviour
 			m_InputTouchs[1].Reset();
 		}
 #else
-	// 更新InputTouch
-	for (int i = 0; i < m_InputTouchs.Length; i++)
-		m_InputTouchs[i].Reset();
+		// 更新InputTouch
+		for (int i = 0; i < m_InputTouchs.Length; i++)
+			m_InputTouchs[i].Reset();
 
-	// for (int i = 0; i < Input.touchCount; i++)
-	//	m_InputTouchs[i] = Input.GetTouch(i);
+		// for (int i = 0; i < Input.touchCount; i++)
+		//	m_InputTouchs[i] = Input.GetTouch(i);
 #endif
 	}
 	#endregion
@@ -300,6 +304,7 @@ public class InputTouch
 	{
 		FingerID = INVALID_TOUCH;
 		ScreenPoint = Vector2.zero;
+		ScreenPoint.y = Screen.height - ScreenPoint.y;
 		Phase = skTouchPhase.Ended;
 		Click = false;
 		TapCount = 0;

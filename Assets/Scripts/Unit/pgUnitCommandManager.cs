@@ -1,6 +1,7 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 /// <summary>
 /// 选择单位. 包括单击选择, 双击选择所有同类单位, 框选等
 /// 操作当前选中的单位. 包括移动, 攻击, 巡逻, 扫荡等
@@ -35,11 +36,14 @@ public class pgUnitCommandManager : MonoBehaviour
 		}
 	}
 
-	protected void Update()
+	private bool m_SelectingByRect = false;
+	private Rect m_SelectingRect = new Rect();
+
+	void Update()
 	{
 		// 选择单位
 		// 单击选择
-		InputTouch touch = null;
+		skInput.InputTouch touch = null;
 		if (skInput.Instance.GetLeftClick(out touch))
 		{
 			Ray mouseRay = Camera.main.ScreenPointToRay(touch.ScreenPoint);
@@ -66,28 +70,34 @@ public class pgUnitCommandManager : MonoBehaviour
 			}
 		}
 
-		// TODO, 框选 / 取消选择
-		if (skInput.Instance.GetLeftButtonHold(out touch))
+		// 框选
+		if (skInput.Instance.GetLeftButtonDown(out touch))
 		{
-			if (!m_IsSelectingByRect)
+			if (!m_SelectingByRect)
 			{
-				m_IsSelectingByRect = true;
-				m_SelectingRect.min = m_SelectingRect.max = touch.ScreenPoint;
+				// TODO, 开始画框 
+
+				m_SelectingRect.min = touch.ScreenPoint;
+				m_SelectingRect.max = touch.ScreenPoint;
+				Debug.Log("开始框选, Rect开始坐标: " + m_SelectingRect.min);
+				m_SelectingByRect = true;
 			}
 			else
 			{
 				m_SelectingRect.max = touch.ScreenPoint;
+				Debug.Log("修改框选, Rect: " + m_SelectingRect);
 			}
 		}
-
+		
 		if (skInput.Instance.GetLeftButtonUp(out touch))
 		{
-			if (m_IsSelectingByRect)
+			if (m_SelectingByRect)
 			{
-				FrustumPlanes
+				// TODO, 获取框选到的单位
 
-				m_IsSelectingByRect = false;
 				m_SelectingRect = Rect.zero;
+				m_SelectingByRect = false;
+				Debug.Log("结束框选, Rect结束坐标: " + m_SelectingRect.max);
 			}
 		}
 
@@ -125,10 +135,17 @@ public class pgUnitCommandManager : MonoBehaviour
 				for (int i = 0; i < m_SelectingUnits.Count; i++)
 				{
 					// TODO, 选中多个单位移动时, 不同单位路径怎么分配? 这事应该CommandManager管, 还是PathFinder管?
-					m_SelectingUnits[i].StartMove(destination);
-					skDebug.Log("单位移动: " + destination);
+					m_SelectingUnits[i].Move(destination);
 				}
 			}
+		}
+	}
+
+	private void OnGUI()
+	{
+		if (m_SelectingByRect)
+		{
+			skUIUtility.DrawScreenRect(m_SelectingRect);
 		}
 	}
 	#endregion
