@@ -19,12 +19,12 @@ public class Test_Input : MonoBehaviour
 	protected void Update()
 	{
 		skInput input = skInput.Instance;
-		skInput.InputTouch[] touches = input.GetTouches();
+		InputTouch[] touches = input.GetTouches();
 
 		int touchCount = 0;
 		for (int i = 0; i < touches.Length; i++)
 		{
-			if (touches[i].FingerID < 0)
+			if (touches[i].!IsValid())
 				continue;
 
 			++touchCount;
@@ -36,7 +36,7 @@ public class Test_Input : MonoBehaviour
 		string output = "TouchCount: " + touchCount + "\r\n";
 		for (int i = 0; i < touches.Length; i++)
 		{
-			if (touches[i].FingerID < 0)
+			if (touches[i].!IsValid())
 				continue;
 
 			output += ", Touch[" + i + "]: "
@@ -44,7 +44,8 @@ public class Test_Input : MonoBehaviour
 						+ ", " + touches[i].ScreenPoint
 						+ ", " + touches[i].Phase
 						+ ", " + touches[i].Click
-						+ ", " + touches[i].TapCount;
+						+ ", " + touches[i]._GetBeginTime()
+						+", " + touches[i].TapCount;
 			output += "\r\n";
 		}
 

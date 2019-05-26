@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 /// <summary>
 /// 选择单位. 包括单击选择, 双击选择所有同类单位, 框选等
 /// 操作当前选中的单位. 包括移动, 攻击, 巡逻, 扫荡等
@@ -13,6 +12,11 @@ public class pgUnitCommandManager : MonoBehaviour
 	#endregion
 
 	#region Private方法
+	/// <summary>
+	/// 正在框选单位
+	/// </summary>
+	private bool m_IsSelectingByRect;
+	private Rect m_SelectingRect = new Rect();
 	#endregion
 
 	#region  Unity消息
@@ -35,7 +39,7 @@ public class pgUnitCommandManager : MonoBehaviour
 	{
 		// 选择单位
 		// 单击选择
-		skInput.InputTouch touch = null;
+		InputTouch touch = null;
 		if (skInput.Instance.GetLeftClick(out touch))
 		{
 			Ray mouseRay = Camera.main.ScreenPointToRay(touch.ScreenPoint);
@@ -48,17 +52,44 @@ public class pgUnitCommandManager : MonoBehaviour
 				{
 					m_SelectingUnits.Clear();
 					m_SelectingUnits.Add(controller);
+
+					skDebug.Log("选中单位: " + controller.name);
+
 					// 选中单位的一帧不判断其他命令
 					return;
 				}
 				else
 				{
-					Debug.LogError(string.Format("Unit({0}) miss controller", unitTransform.name), unitTransform.gameObject);
+					m_SelectingUnits.Clear();
+					skDebug.Log("清理选中的单位");
 				}
 			}
 		}
 
 		// TODO, 框选 / 取消选择
+		if (skInput.Instance.GetLeftButtonHold(out touch))
+		{
+			if (!m_IsSelectingByRect)
+			{
+				m_IsSelectingByRect = true;
+				m_SelectingRect.min = m_SelectingRect.max = touch.ScreenPoint;
+			}
+			else
+			{
+				m_SelectingRect.max = touch.ScreenPoint;
+			}
+		}
+
+		if (skInput.Instance.GetLeftButtonUp(out touch))
+		{
+			if (m_IsSelectingByRect)
+			{
+				FrustumPlanes
+
+				m_IsSelectingByRect = false;
+				m_SelectingRect = Rect.zero;
+			}
+		}
 
 		// 操作单位. 攻击/移动/扫荡
 		// 移动
@@ -71,18 +102,22 @@ public class pgUnitCommandManager : MonoBehaviour
 				// 播放特效
 				m_DestinationEffect.SetActive(true);
 				m_DestinationEffect.transform.position = hit.point;
-				ParticleSystem[] destinationEffects = m_DestinationEffect.GetComponentsInChildren<ParticleSystem>();
-				if (destinationEffects.Length != 0)
+
+				// UNDONE, 这段删掉, 加入VFXController
 				{
-					for (int i = 0; i < destinationEffects.Length; i++)
+					ParticleSystem[] destinationEffects = m_DestinationEffect.GetComponentsInChildren<ParticleSystem>();
+					if (destinationEffects.Length != 0)
 					{
-						destinationEffects[i].Clear();
-						destinationEffects[i].Play();
+						for (int i = 0; i < destinationEffects.Length; i++)
+						{
+							destinationEffects[i].Clear();
+							destinationEffects[i].Play();
+						}
 					}
-				}
-				else
-				{
-					Debug.LogError("missing ParticleSystem on destinationEffect", m_DestinationEffect);
+					else
+					{
+						Debug.LogError("missing ParticleSystem on destinationEffect", m_DestinationEffect);
+					}
 				}
 
 				// 单位移动
@@ -90,7 +125,8 @@ public class pgUnitCommandManager : MonoBehaviour
 				for (int i = 0; i < m_SelectingUnits.Count; i++)
 				{
 					// TODO, 选中多个单位移动时, 不同单位路径怎么分配? 这事应该CommandManager管, 还是PathFinder管?
-					m_SelectingUnits[i].Move(destination);
+					m_SelectingUnits[i].StartMove(destination);
+					skDebug.Log("单位移动: " + destination);
 				}
 			}
 		}

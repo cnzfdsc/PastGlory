@@ -13,17 +13,12 @@ using UnityEngine;
 public class pgUnitController : MonoBehaviour
 {
 	#region  Public方法
-	public void Move(Vector3 destination)
+	public void StartMove(Vector3 destination)
 	{
 		m_PathFinder.FindPath(m_Unit, destination, ref m_WayPoints);
+
 		m_UnitState = UnitState.Move;
 		m_CurrentWayPoint = 0;
-		Vector3 direction = m_WayPoints[m_CurrentWayPoint] - m_Unit.transform.position;
-		direction.y = 0;
-		direction.Normalize();
-		// TODO, 有坡地的话这里需要改
-		m_Unit.transform.rotation = Quaternion.LookRotation(direction);
-		// TODO, 播放动画
 	}
 
 	public void Stop()
@@ -49,37 +44,37 @@ public class pgUnitController : MonoBehaviour
 	{
 		switch (m_UnitState)
 		{
-		case UnitState.Stop:
-			break;
+			case UnitState.Stop:
+				break;
 
-		case UnitState.Move:
-			float sqrDis = Vector3.SqrMagnitude(m_Unit.transform.position - m_WayPoints[m_CurrentWayPoint]);
-			Debug.Log(sqrDis);
-			if (Vector3.SqrMagnitude(m_Unit.transform.position - m_WayPoints[m_CurrentWayPoint]) < ReachedWayPointThreshold * ReachedWayPointThreshold)
-			{
-				if (++m_CurrentWayPoint <= m_WayPoints.Count)
-					Move(m_WayPoints[m_CurrentWayPoint]);
+			case UnitState.Move:
+				float sqrDis = Vector3.SqrMagnitude(m_Unit.transform.position - m_WayPoints[m_CurrentWayPoint]);
+				if (Vector3.SqrMagnitude(m_Unit.transform.position - m_WayPoints[m_CurrentWayPoint]) < ReachedWayPointThreshold * ReachedWayPointThreshold)
+				{
+					if (++m_CurrentWayPoint >= m_WayPoints.Count)
+						Stop();
+				}
 				else
-					Stop();
-			}
-			else
-			{
-				Vector3 direction = m_WayPoints[m_CurrentWayPoint] - m_Unit.transform.position;
-				direction.y = 0;
-				direction.Normalize();
-				m_Unit.transform.position += m_Unit.Speed * Time.deltaTime * direction;
-			}
-			break;
+				{
+					Vector3 direction = m_WayPoints[m_CurrentWayPoint] - m_Unit.transform.position;
+					direction.y = 0;
+					direction.Normalize();
+					// TODO, 有坡地的话这里需要改
+					m_Unit.transform.rotation = Quaternion.LookRotation(direction);
+					m_Unit.transform.position += m_Unit.Speed * Time.deltaTime * direction;
+					// TODO, 播放动画
+				}
+				break;
 
-		case UnitState.Sweep:
-			break;
+			case UnitState.Sweep:
+				break;
 
-		case UnitState.Patrol:
-			break;
+			case UnitState.Patrol:
+				break;
 
-		default:
-			skDebug.Assert(false, "wrong unit state", this);
-			break;
+			default:
+				skDebug.Assert(false, "wrong unit state", this);
+				break;
 		}
 	}
 	#endregion

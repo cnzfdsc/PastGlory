@@ -26,5 +26,15 @@ public class skDebug : MonoBehaviour
 		return Assert(valid, failedMessage, context);
 	}
 
+	public static void Log(string logString, Object context)
+	{
+		Debug.Log(logString, context);
+	}
+
+	public static void Log(string logString)
+	{
+		Debug.Log(logString);
+	}
+
 	#endregion
 }
